@@ -1,0 +1,11 @@
+[project]
+name = "snf2-rnaseq"
+version = "0.1.0"
+description = "Bulk RNA-seq from raw reads in yeast (WT vs snf2), with an analysis of how differential expression results change with replicate number."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "biopython>=1.88",
+    "fastq>=2.0.4",
+    "matplotlib>=3.11.1",
+]
