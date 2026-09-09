@@ -2,6 +2,7 @@ import gzip
 import numpy as np
 from Bio import SeqIO
 import matplotlib.pyplot as plt
+import pandas as pd
 
 n = 100_000
 per_read = []   
