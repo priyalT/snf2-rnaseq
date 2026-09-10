@@ -223,3 +223,6 @@ data
 .DS_Store
 
 results/
+
+genome/
+scerevisiae_star/
