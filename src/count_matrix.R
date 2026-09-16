@@ -52,5 +52,17 @@ merged_df <- Reduce(
 
 
 count_matrix <- as.matrix(merged_df)
-count_matrix <- count_matrix[, rownames(coldata)]
 
+row_sub = apply(count_matrix, 1, function(row) all(row ==0 ))
+row_N <- !rownames(count_matrix) %in% c(
+  "N_ambiguous",
+  "N_multimapping",
+  "N_noFeature",
+  "N_unmapped"
+)
+
+count_matrix <- count_matrix[row_N, ]
+count_zero_rows = count_matrix[row_sub,]
+
+min(count_matrix)
+max(count_matrix)
