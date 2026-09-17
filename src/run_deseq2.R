@@ -1,6 +1,7 @@
 library(DESeq2)
 install.packages("tidyverse")
 BiocManager::install("apeglm")
+library(ggplot2)
 library(apeglm)
 library(tidyverse)
 
@@ -32,16 +33,24 @@ res0.01 <- results(dds, alpha = 0.05)
 summary(res0.01)
 res
 
+png("../plots/MA_plot.png", width = 800, height = 600)
 plotMA(res)
+dev.off()
 
 vsd <- vst(dds, blind = TRUE)
+png("../plots/PCA_plot.png", width = 800, height = 600)
 plotPCA(vsd, intgroup = "condition")
+dev.off()
+
 
 resultsNames(dds)
 resLFC <- lfcShrink(dds, coef = "condition_snf2_vs_WT", type = "apeglm")
 
+png("../plots/MA_shrunkenLFC_plot.png", width = 800, height = 600)
 plotMA(resLFC)
+dev.off()
 
+png("../plots/compare_shrunkenLFC_plot.png", width = 800, height = 600)
 plot(
   res$log2FoldChange,
   resLFC$log2FoldChange,
@@ -49,6 +58,7 @@ plot(
   ylab = "Shrunken LFC"
 )
 abline(0, 1, col = "red")
+dev.off()
 
 
 resdf <- as.data.frame(resLFC)
@@ -56,12 +66,11 @@ resdf$sig <- !is.na(resdf$padj) &
              resdf$padj < 0.05 & 
              abs(resdf$log2FoldChange) > 1
 
-ggplot(resdf, aes(log2FoldChange, -log10(pvalue), colour = sig)) +
+volcano <- ggplot(resdf, aes(log2FoldChange, -log10(pvalue), colour = sig)) +
   geom_point(alpha = 0.4, size = 0.8) +
   scale_colour_manual(values = c("grey70", "#c0392b")) +
   theme_minimal() + labs(colour = "padj<0.05 & |LFC|>1")
+ggsave("../plots/Volcano_plot.png", plot = volcano)
 
 write.csv(as.data.frame(resLFC[order(resLFC$padj), ]),
           "../results/de_snf2_vs_WT.csv")
-
-resLFC["YOR290C", ]
