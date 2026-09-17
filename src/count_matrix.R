@@ -46,5 +46,11 @@ merged_df <- Reduce(
 )
 
 class(merged_df)
+merged_df <- merged_df[!row.names(merged_df) %in% c("N_ambiguous", "N_multimapping",
+                                    "N_noFeature", "N_unmapped"), , drop = FALSE]
+
+
 write.csv(merged_df, 
           "../results/countmatrix.csv")
+
+
