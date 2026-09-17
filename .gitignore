@@ -228,3 +228,6 @@ results/
 
 genome/
 scerevisiae_star/
+
+.RData
+.Rhistory
