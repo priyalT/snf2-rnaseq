@@ -65,6 +65,7 @@ biological replicates each of wild-type and Δsnf2 *S. cerevisiae*.
 | Samples used | 12 of 96 (6 WT, 6 Δsnf2) — see `data/samplesheet.csv` |
 | Reads | 51 bp, single-end, Illumina HiSeq 2000 (2014) |
 | Reference | Ensembl R64-1-1, `dna.toplevel.fa` + release-114 GTF |
+| Strandedness | **Unstranded** — verified: forward/reverse counts split 51.5% / 48.5% (475,612 vs 448,211), so column 2 of `ReadsPerGene.out.tab` is correct |
 
 Only 12 of the 96 available samples were used because of storage constrictions (roughly 20 GB of free disk). Raw and trimmed FASTQ, the STAR
 index and BAM-adjacent outputs are **not** committed (see `.gitignore`).
@@ -164,22 +165,20 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ## Current limitations
 
-1. **Strandedness was never verified.** Column 2 (unstranded) of
-   `ReadsPerGene.out.tab` was used without any proper confirmation.
-2. **`src/fastqc.sh` and `src/trim.sh` glob the current working directory** and
+1. **`src/fastqc.sh` and `src/trim.sh` glob the current working directory** and
    take no arguments, so they only work if invoked from `data/raw/`. They are a
    record of what was run, not a runnable interface.
-3. **`src/alignment.sh` hardcodes an absolute path** to the samplesheet.
-4. **Independent-filtering threshold mismatch.** `lfcShrink()` inherits the
+2. **`src/alignment.sh` hardcodes an absolute path** to the samplesheet.
+3. **Independent-filtering threshold mismatch.** `lfcShrink()` inherits the
    `results()` call made at the default `alpha = 0.1`, while significance is
    reported at 0.05. The optimal filtering threshold differs slightly between
    the two, so a small number of borderline padj values would change if the
    contrast were recomputed at `alpha = 0.05` throughout.
-7. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
+4. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
    HiSeq 2000 flow-cell artefact, not a library problem, and no reads were
    removed on account of it. Whether the failures correlate with lane has not
    been checked.
-8. **No batch term in the design.** The model is `~ condition` only. The
+5. **No batch term in the design.** The model is `~ condition` only. The
    original study's samples span multiple lanes; lane was not tested as a
    covariate.
 
@@ -187,7 +186,6 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ## Future improvements
 
-- [ ] Verify strandedness; re-run if column 2 was the wrong choice
 - [ ] Make `fastqc.sh` / `trim.sh` / `alignment.sh` take paths as arguments
 - [ ] Move package installation out of `run_deseq2.R` into an environment file
       (`environment.yml` / `renv.lock`)

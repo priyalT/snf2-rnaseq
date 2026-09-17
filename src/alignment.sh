@@ -1,4 +1,4 @@
-tail -n +2 /Users/priyaltripathi/snf2-rnaseq/data/samplesheet.csv | cut -d, -f1 | while read -r s; do
+tail -n +2 ../data/samplesheet.csv | cut -d, -f1 | while read -r s; do
     echo "=== $s ==="
     rm -rf results/alignment/star/${s}_*
 

@@ -1,6 +1,4 @@
 library(DESeq2)
-install.packages("tidyverse")
-BiocManager::install("apeglm")
 library(ggplot2)
 library(apeglm)
 library(tidyverse)
