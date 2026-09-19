@@ -2,14 +2,23 @@
 ## Summary
 
 Bulk RNA-seq from raw reads: differential gene expression in *Saccharomyces cerevisiae* involving two conditions:
-**Δsnf2** versus **wild type**.
+**snf2Δ** versus **wild type**.
 
-Twelve samples were included (6 WT, 6 Δsnf2) from [ENA PRJEB5348](https://www.ebi.ac.uk/ena/browser/view/PRJEB5348)
+Twelve samples were included (6 WT, 6 snf2Δ) from [ENA PRJEB5348](https://www.ebi.ac.uk/ena/browser/view/PRJEB5348)
 taken end to end from: 
 
 **raw FASTQ** → QC → adapter/quality trimming → splice-aware
 alignment → gene-level counting → **differential expression**
 
+
+## Scope
+
+**In scope:** 12 of the 96 available samples, one contrast (snf2Δ vs WT), the
+standard upstream workflow, with each parameter choice and its reasoning
+recorded, and the known weaknesses listed rather than hidden.
+
+**Not in scope:** novel biology, method development, production packaging, or the
+replicate-depth question the source dataset was designed around.
 
 ## Result
 
@@ -20,7 +29,7 @@ The most significant change in the whole experiment is
 |---|---|---:|---:|---:|
 | **SNF2** | YOR290C | **−5.35** | 120 | 1.5 × 10⁻⁵⁸ |
 
-Summary of the full contrast (Δsnf2 vs WT, Wald test, Benjamini–Hochberg):
+Summary of the full contrast (snf2Δ vs WT, Wald test, Benjamini–Hochberg):
 
 | | |
 |---|---:|
@@ -44,7 +53,7 @@ analysis was set up to look for.
 
 | | |
 |---|---|
-| `plots/PCA_plot.png` | VST-transformed samples; WT and Δsnf2 separate on PC1 |
+| `plots/PCA_plot.png` | VST-transformed samples; WT and snf2Δ separate on PC1 |
 | `plots/MA_plot.png` | Unshrunken log2 fold changes |
 | `plots/MA_shrunkenLFC_plot.png` | The same contrast after `apeglm` shrinkage |
 | `plots/ShrunkenLFC_comparison_plot.png` | Unshrunken vs shrunken LFC, with y = x |
@@ -56,13 +65,13 @@ analysis was set up to look for.
 
 [Gierliński et al. 2015](https://doi.org/10.1093/bioinformatics/btv425) /
 [Schurch et al. 2016](https://doi.org/10.1261/rna.053959.115) generated 48
-biological replicates each of wild-type and Δsnf2 *S. cerevisiae*.
+biological replicates each of wild-type and snf2Δ *S. cerevisiae*.
 
 | | |
 |---|---|
 | Accession | ENA PRJEB5348 |
 | Organism | *S. cerevisiae*, BY4741 background |
-| Samples used | 12 of 96 (6 WT, 6 Δsnf2) — see `data/samplesheet.csv` |
+| Samples used | 12 of 96 (6 WT, 6 snf2Δ) — see `data/samplesheet.csv` |
 | Reads | 51 bp, single-end, Illumina HiSeq 2000 (2014) |
 | Reference | Ensembl R64-1-1, `dna.toplevel.fa` + release-114 GTF |
 | Strandedness | **Unstranded** — verified: forward/reverse counts split 51.5% / 48.5% (475,612 vs 448,211), so column 2 of `ReadsPerGene.out.tab` is correct |
@@ -127,10 +136,27 @@ data/raw/*.fastq
 
 ## Reproducing
 
-**Requirements:** `fastqc`, `multiqc`, `trim_galore` (+ `cutadapt`), `STAR ≥ 2.7`,
-`R ≥ 4.3` with `DESeq2`, `apeglm`, `tidyverse`, `glue`, `readr`. Python side is
-managed with [uv](https://docs.astral.sh/uv/) — `uv sync`.
+### Requirements
 
+These are the exact versions that produced the results in this repository, and
+how each one was installed on the machine that ran it (macOS, Apple Silicon).
+
+
+| Tool | Version | Installed via |
+|---|---|---|
+| STAR | 2.7.11b | compiled from the GitHub release |
+| Trim Galore | 2.3.0 | Homebrew (`brew install trim-galore`) |
+| FastQC | 0.12.1 | official zip, unpacked locally (gitignored) |
+| MultiQC | 1.35 | uv, from `pyproject.toml` + `uv.lock` — `uv sync` |
+| R | 4.6.0 | CRAN installer |
+| DESeq2 | 1.52.0 | Bioconductor — `Rscript src/install_r_packages.R` |
+| apeglm | 1.34.0 | Bioconductor — same script |
+
+Trim Galore 2.x is a self-contained binary and no longer needs a separate
+`cutadapt` install; 0.6.x did.
+
+Pinning these into one reproducible environment is the job of a container, and
+is deferred to the Nextflow work in [Future improvements](#future-improvements).
 ```bash
 # 1. reference — Ensembl release 114, S. cerevisiae R64-1-1
 #    unsoftmasked toplevel FASTA + matching GTF, both gunzipped
@@ -183,24 +209,6 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ---
 
-## Future improvements
-
-- [ ] Move package installation out of `run_deseq2.R` into an environment file
-      (`environment.yml` / `renv.lock`)
-- [ ] GO and pathway enrichment on the DE list — formally test the phosphate signal
-- [ ] Lane as a covariate: `~ lane + condition`, compare
-- [ ] **Replicate-depth analysis** — subsample *n* = 2, 3, 6, 12, 24, 48 per
-      condition from the full 96-sample design, repeat the contrast, and plot how
-      the recovered DE set and its fold changes stabilise with *n*. This is the
-      question the dataset was built for and the natural extension of this repo.
-- [ ] **Wrap the pipeline in Nextflow DSL2** — one process per step
-      (`FASTQC`, `TRIMGALORE`, `STAR_GENOMEGENERATE`, `STAR_ALIGN`, `MULTIQC`),
-      driven by `data/samplesheet.csv`, using nf-core modules where they exist,
-      with containers per process and `-resume` for restartability. The shell
-      scripts here map onto processes almost one-to-one, which is the point of
-      having written them this way first.
-
----
 
 ## References
 

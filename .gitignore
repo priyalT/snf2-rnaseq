@@ -224,7 +224,12 @@ FastQC
 data
 .DS_Store
 
-results/
+# Exclude results/ CONTENTS (not the directory itself), so the two small
+# result tables below can be re-included. A negation cannot rescue a file
+# whose parent directory is excluded.
+results/*
+!results/countmatrix.csv
+!results/de_snf2_vs_WT.csv
 
 genome/
 scerevisiae_star/
