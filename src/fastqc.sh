@@ -1,3 +1,4 @@
 #!/bin/bash
-gunzip *.gz
-fastqc -o ../../results/ *.fq
+# Run from src/
+
+fastqc -o ../results/ ../data/raw/*.fastq

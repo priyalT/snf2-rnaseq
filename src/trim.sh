@@ -1,3 +1,4 @@
 #!/bin/bash
+# Run from src/
 
-trim_galore *.fastq
+trim_galore -o ../data/raw ../data/raw/*.fastq

@@ -165,20 +165,19 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ## Current limitations
 
-1. **`src/fastqc.sh` and `src/trim.sh` glob the current working directory** and
-   take no arguments, so they only work if invoked from `data/raw/`. They are a
-   record of what was run, not a runnable interface.
-2. **`src/alignment.sh` hardcodes an absolute path** to the samplesheet.
-3. **Independent-filtering threshold mismatch.** `lfcShrink()` inherits the
+1. **All shell scripts use paths relative to `src/`** and must be run from
+   there (`cd src && bash alignment.sh`). They take no arguments, so input and
+   output locations are fixed.
+2. **Independent-filtering threshold mismatch.** `lfcShrink()` inherits the
    `results()` call made at the default `alpha = 0.1`, while significance is
    reported at 0.05. The optimal filtering threshold differs slightly between
    the two, so a small number of borderline padj values would change if the
    contrast were recomputed at `alpha = 0.05` throughout.
-4. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
+3. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
    HiSeq 2000 flow-cell artefact, not a library problem, and no reads were
    removed on account of it. Whether the failures correlate with lane has not
    been checked.
-5. **No batch term in the design.** The model is `~ condition` only. The
+4. **No batch term in the design.** The model is `~ condition` only. The
    original study's samples span multiple lanes; lane was not tested as a
    covariate.
 
@@ -186,7 +185,6 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ## Future improvements
 
-- [ ] Make `fastqc.sh` / `trim.sh` / `alignment.sh` take paths as arguments
 - [ ] Move package installation out of `run_deseq2.R` into an environment file
       (`environment.yml` / `renv.lock`)
 - [ ] GO and pathway enrichment on the DE list — formally test the phosphate signal
