@@ -116,6 +116,7 @@ biological replicates each of wild-type and snf2Δ *S. cerevisiae*.
 | Accession | ENA PRJEB5348 |
 | Organism | *S. cerevisiae*, BY4741 background |
 | Samples used | 12 of 96 (6 WT, 6 snf2Δ) — see `data/samplesheet.csv` |
+| Replicate structure | 12 distinct biological replicates, one flow cell (`D0PT7ACXX`), six lanes |
 | Reads | 51 bp, single-end, Illumina HiSeq 2000 (2014) |
 | Reference | Ensembl R64-1-1, `dna.toplevel.fa` + release-114 GTF |
 | Strandedness | **Unstranded** — verified: forward/reverse counts split 51.5% / 48.5% (475,612 vs 448,211), so column 2 of `ReadsPerGene.out.tab` is correct |
@@ -217,14 +218,18 @@ comm -13 <(grep ">" genome/*.fa | cut -d" " -f1 | tr -d ">" | sort -u) \
 # 2. reads — accessions in data/samplesheet.csv, from ENA PRJEB5348
 #    into data/raw/
 
-# 3. QC, trim, index, align
-bash src/fastqc.sh
-bash src/trim.sh
-bash src/index_creation_star.sh
-bash src/alignment.sh
+# 3. every script below uses paths relative to src/, so run them from there
+cd src
 
-# 4. counts and differential expression
-cd src && Rscript count_matrix.R && Rscript run_deseq2.R
+# 4. QC, trim, index, align
+bash fastqc.sh
+bash trim.sh
+bash index_creation_star.sh
+bash alignment.sh
+
+# 5. counts and differential expression
+Rscript count_matrix.R
+Rscript run_deseq2.R
 ```
 
 `src/alignment.sh` clears each sample's output prefix before running, so it is
@@ -235,16 +240,10 @@ idempotent (see [Known limitations](#current-limitations)).
 
 ## Current limitations
 
-1. **All shell scripts use paths relative to `src/`** and must be run from
-   there (`cd src && bash alignment.sh`). They take no arguments, so input and
-   output locations are fixed.
-2. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
+1. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
    HiSeq 2000 flow-cell artefact, not a library problem, and no reads were
    removed on account of it. Whether the failures correlate with lane has not
    been checked.
-3. **No batch term in the design.** The model is `~ condition` only. The
-   original study's samples span multiple lanes; lane was not tested as a
-   covariate.
 
 ---
 
