@@ -24,12 +24,9 @@ dds$condition <- relevel(dds$condition, ref="WT")
 dds$condition    
 
 dds <- DESeq(dds)
-res <- results(dds)
-summary(res)
 
-res0.01 <- results(dds, alpha = 0.05)
-summary(res0.01)
-res
+res <- results(dds, alpha = 0.05)
+summary(res)
 
 png("../plots/MA_plot.png", width = 800, height = 600)
 plotMA(res)
@@ -40,9 +37,8 @@ png("../plots/PCA_plot.png", width = 800, height = 600)
 plotPCA(vsd, intgroup = "condition")
 dev.off()
 
-
 resultsNames(dds)
-resLFC <- lfcShrink(dds, coef = "condition_snf2_vs_WT", type = "apeglm")
+resLFC <- lfcShrink(dds, coef = "condition_snf2_vs_WT", type = "apeglm", res = res)
 
 png("../plots/MA_shrunkenLFC_plot.png", width = 800, height = 600)
 plotMA(resLFC)
@@ -57,7 +53,6 @@ plot(
 )
 abline(0, 1, col = "red")
 dev.off()
-
 
 resdf <- as.data.frame(resLFC)
 resdf$sig <- !is.na(resdf$padj) & 

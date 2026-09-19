@@ -22,32 +22,76 @@ replicate-depth question the source dataset was designed around.
 
 ## Result
 
-The most significant change in the whole experiment is
-**SNF2 itself**, the gene that was knocked out.
+The largest fold change in the whole experiment is **SNF2 itself**, the gene
+that was knocked out. Of 1,372 significant genes, none moves further than the
+one that was deleted.
 
-| Gene | Systematic ID | log2FC (shrunken) | baseMean | padj |
-|---|---|---:|---:|---:|
-| **SNF2** | YOR290C | **−5.35** | 120 | 1.5 × 10⁻⁵⁸ |
+| Gene | Systematic ID | log2FC (shrunken) | lfcSE | baseMean | padj |
+|---|---|---:|---:|---:|---:|
+| **SNF2** | YOR290C | **−6.92** | 0.42 | 120 | 1.6 × 10⁻⁵⁸ |
 
 Summary of the full contrast (snf2Δ vs WT, Wald test, Benjamini–Hochberg):
 
 | | |
 |---|---:|
 | Gene features in the annotation (Ensembl 114 on R64-1-1; 6,600 protein-coding) | 7,127 |
-| Genes passing the count filter | 5,401 |
-| Genes with a usable padj (30 dropped as Cook's-distance outliers) | 5,371 |
-| Significant at padj < 0.05 | 1,348 |
-| Significant **and** \|log2FC\| > 1 | 296 (73 up, 223 down) |
+| Genes passing the count filter (`rowSums(counts) >= 10`) | 6,115 |
+| Genes with a usable padj | 5,844 |
+| Significant at padj < 0.05 | 1,372 |
+| Significant **and** \|log2FC\| > 1 | 396 (119 up, 277 down) |
 
 A quarter of the tested transcriptome moves at padj < 0.05. That is expected because
 Snf2 is the catalytic ATPase of the SWI/SNF chromatin-remodelling complex, so
 deleting it perturbs transcription globally rather than in one pathway. 
 
-**Observed pattern:** Among the strongest downregulated genes
-are `PHO84`, `PHO12`, `SPL2`, `VTC3` and `VTC4` which are all phosphate-responsive.
+**Observed pattern:** the second and third largest effects after SNF2 are
+`PHO12` and `SPL2`, and `PHO84`, `VTC3` and `VTC4` are close behind — all
+phosphate-responsive genes, all down.
 SWI/SNF is known to be required for chromatin remodelling at PHO promoters, so
 this is a coherent signal rather than noise, and it was not something the
 analysis was set up to look for.
+
+### Statistical choices
+
+**`alpha = 0.05` is passed explicitly to `results()`, and that result is passed
+into `lfcShrink()`.** This matters more than it looks. DESeq2 does *independent
+filtering* before BH correction — it discards genes whose mean normalised count
+is too low to ever reach significance, which reduces the number of tests and so
+reduces the multiple-testing penalty on the genes that remain. The threshold is
+not fixed: DESeq2 chooses the quantile that maximises the number of genes
+significant **at the alpha it was given**. Measured on this dataset:
+
+| alpha | quantile chosen | baseMean threshold |
+|---|---:|---:|
+| 0.10 (the default) | 0.00 % | 0.64 |
+| 0.05 (used here) | 3.88 % | 2.12 |
+
+Running at the default 0.10 and then reporting at 0.05 changed the significance
+call for 20 genes — 15 gained significance, 5 lost it. The 15 gains are the
+point of the filter: removing ~240 hopeless genes lightens BH's penalty enough
+for borderline genes to cross. The 5 losses all had `baseMean` below 2.12 and
+nominal p-values around 0.005 on one or two reads per sample, which is exactly
+what the filter exists to discard.
+
+**The 271 genes with `padj = NA` come from two different mechanisms**, which are
+distinguishable by whether `pvalue` is also `NA`:
+
+- **238 independent filtering** — `pvalue` present, `padj` `NA`, all with
+  `baseMean` ≤ 2.117, the threshold above.
+- **33 Cook's-distance outliers** — both `pvalue` and `padj` `NA`. At least one
+  sample carries a count extreme enough to dominate the fit. With 6 replicates
+  per condition DESeq2 is below its `minReplicatesForReplace = 7` threshold, so
+  it declines to test these rather than replacing the outlying count.
+
+**Shrunken fold changes depend on the gene set they were fitted alongside.**
+`apeglm` estimates its prior empirically, from the spread of fold changes across
+every gene in the object. An earlier run of this analysis used a count matrix
+with 5,401 genes and reported SNF2 at −5.35 (lfcSE 0.23); the current 6,115-gene
+matrix gives −6.92 (lfcSE 0.42) for identical counts — `baseMean` 120.3 and
+p = 1.4 × 10⁻⁶¹ in both. The extra low-count genes widened the observed fold-change
+distribution, so the fitted prior is heavier-tailed and large effects are shrunk
+less. A shrunken log2 fold change is therefore not a property of a gene on its
+own, and the gene set is part of the result.
 
 ### Figures
 
@@ -56,7 +100,7 @@ analysis was set up to look for.
 | `plots/PCA_plot.png` | VST-transformed samples; WT and snf2Δ separate on PC1 |
 | `plots/MA_plot.png` | Unshrunken log2 fold changes |
 | `plots/MA_shrunkenLFC_plot.png` | The same contrast after `apeglm` shrinkage |
-| `plots/ShrunkenLFC_comparison_plot.png` | Unshrunken vs shrunken LFC, with y = x |
+| `plots/compare_shrunkenLFC_plot.png` | Unshrunken vs shrunken LFC, with y = x |
 | `plots/Volcano_plot.png` | padj < 0.05 & \|log2FC\| > 1 highlighted |
 
 
@@ -194,16 +238,11 @@ idempotent (see [Known limitations](#current-limitations)).
 1. **All shell scripts use paths relative to `src/`** and must be run from
    there (`cd src && bash alignment.sh`). They take no arguments, so input and
    output locations are fixed.
-2. **Independent-filtering threshold mismatch.** `lfcShrink()` inherits the
-   `results()` call made at the default `alpha = 0.1`, while significance is
-   reported at 0.05. The optimal filtering threshold differs slightly between
-   the two, so a small number of borderline padj values would change if the
-   contrast were recomputed at `alpha = 0.05` throughout.
-3. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
+2. **Per-tile sequence quality fails in 11 of 12 samples.** This is a 2014
    HiSeq 2000 flow-cell artefact, not a library problem, and no reads were
    removed on account of it. Whether the failures correlate with lane has not
    been checked.
-4. **No batch term in the design.** The model is `~ condition` only. The
+3. **No batch term in the design.** The model is `~ condition` only. The
    original study's samples span multiple lanes; lane was not tested as a
    covariate.
 
