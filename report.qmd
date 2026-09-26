@@ -16,6 +16,8 @@ execute:
 ## 1. Introduction
 This report summarizes the results of the RNA-Seq pipeline comparing **snf2 knockout** against **Wild Type (WT)** in *Saccharomyces cerevisiae*. The pipeline was executed using Nextflow and Seqera Containers, processing raw FASTQ files through alignment, quantification, differential expression, and pathway enrichment.
 
+### 1.1 Pipeline Workflow (DAG)
+![Nextflow Pipeline DAG](workflow/results/dag.png)
 ## 2. Quality Control
 The initial quality of the reads and the alignment rates were aggregated using MultiQC.
 
