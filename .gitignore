@@ -56,7 +56,7 @@ cover/
 *.pot
 
 # Django stuff:
-*.log
+# *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -236,3 +236,12 @@ scerevisiae_star/
 
 .RData
 .Rhistory
+
+# Nextflow
+.nextflow/
+.nextflow.log*
+work/
+workflow/.nextflow/
+workflow/.nextflow.log*
+workflow/work/
+workflow/results/
