@@ -31,9 +31,8 @@ tryCatch({
   dev.off()
 
   vsd <- vst(dds, blind = TRUE)
-  png("deseq2_output/PCA_plot.png", width = 800, height = 600)
-  plotPCA(vsd, intgroup = "condition")
-  dev.off()
+  pca_plot <- plotPCA(vsd, intgroup = "condition")
+  ggsave("deseq2_output/PCA_plot.png", plot = pca_plot, width = 8, height = 6)
 
   resLFC <- lfcShrink(dds, coef = "condition_snf2_vs_WT", type = "apeglm", res = res)
 
