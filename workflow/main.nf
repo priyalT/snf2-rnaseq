@@ -5,6 +5,7 @@ include { TRIM_GALORE } from './modules/trimgalore.nf'
 include { STAR_INDEX } from './modules/star_index.nf'
 include { STAR_ALIGN } from './modules/star_align.nf'
 include { COUNT_MATRIX } from './modules/count_matrix.nf'
+include { DESEQ2 } from './modules/deseq2.nf'
 
  params {
     input: Path
@@ -34,6 +35,7 @@ workflow {
     STAR_ALIGN(TRIM_GALORE.out.trimmed_reads, star_index_ch)
     samplesheet_ch = channel.fromPath(params.samplesheet)
     COUNT_MATRIX(STAR_ALIGN.out.gene_counts.collect(), samplesheet_ch)
+    DESEQ2(COUNT_MATRIX.out.count_matrix, samplesheet_ch)
 
 
     publish:
@@ -45,6 +47,7 @@ workflow {
     gene_counts = STAR_ALIGN.out.gene_counts
     align_log = STAR_ALIGN.out.align_log
     count_matrix = COUNT_MATRIX.out.count_matrix
+    deseq2_results = DESEQ2.out.deseq2_output
 
 }
 
@@ -72,6 +75,9 @@ output {
     }
     count_matrix {
         path 'counts'
+    }
+    deseq2_results {
+        path 'deseq2'
     }
 
 }
