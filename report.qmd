@@ -1,0 +1,62 @@
+---
+title: "RNA-Seq Analysis Report: snf2 vs WT"
+author: "Priyal Tripathi"
+date: today
+format: 
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+---
+
+## 1. Introduction
+This report summarizes the results of the RNA-Seq pipeline comparing **snf2 knockout** against **Wild Type (WT)** in *Saccharomyces cerevisiae*. The pipeline was executed using Nextflow and Seqera Containers, processing raw FASTQ files through alignment, quantification, differential expression, and pathway enrichment.
+
+## 2. Quality Control
+The initial quality of the reads and the alignment rates were aggregated using MultiQC.
+
+[Link to full MultiQC Report](workflow/results/multiqc/all_single-end.html)
+
+## 3. Differential Expression Analysis (DESeq2)
+Differential expression was calculated using `DESeq2`, and log2 fold changes were shrunken using the `apeglm` estimator to account for low-count noise.
+
+### 3.1 Principal Component Analysis (PCA)
+PCA shows the overall variance in the dataset. Samples should cluster primarily by their biological condition (snf2 vs WT).
+
+![PCA Plot](workflow/results/deseq2/deseq2_output/PCA_plot.png)
+
+### 3.2 MA Plot
+The MA plot shows the relationship between mean expression (x-axis) and log2 fold change (y-axis). Significant genes are highlighted.
+
+![Shrunken MA Plot](workflow/results/deseq2/deseq2_output/MA_shrunkenLFC_plot.png)
+
+### 3.3 Volcano Plot
+The Volcano plot visualizes magnitude of change (log2 Fold Change) versus statistical significance (-log10 p-value). Red dots represent genes passing the thresholds (padj < 0.05 & |LFC| > 1).
+
+![Volcano Plot](workflow/results/deseq2/deseq2_output/Volcano_plot.png)
+
+## 4. Functional Enrichment Analysis
+
+### 4.1 Over-Representation Analysis (ORA)
+ORA identifies biological pathways that are significantly over-represented among the strictly filtered, differentially expressed genes.
+
+![ORA Dotplot](workflow/results/enrichment/enrichment_output/ORA_dotplot.png)
+<br>
+![ORA Cnetplot](workflow/results/enrichment/enrichment_output/ORA_cnetplot.png)
+
+### 4.2 Gene Set Enrichment Analysis (GSEA)
+Unlike ORA, GSEA uses the entire ranked list of genes (ranked by shrunken log2FoldChange) to find coordinated shifts in biological pathways, regardless of strict significance cutoffs.
+
+**Top Enriched Pathway:**
+![GSEA Top Pathway](workflow/results/enrichment/enrichment_output/GSEA_top_pathway.png)
+
+## 5. Data Files
+The raw CSV outputs are available in the results directory:
+* [DESeq2 Full Results CSV](workflow/results/deseq2/deseq2_output/de_snf2_vs_WT.csv)
+* [Count Matrix](workflow/results/counts/countmatrix.csv)
+* [ORA Results](workflow/results/enrichment/enrichment_output/ORA_results.csv)
+* [GSEA Results](workflow/results/enrichment/enrichment_output/GSEA_results.csv)
