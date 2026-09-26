@@ -7,6 +7,7 @@ include { STAR_ALIGN } from './modules/star_align.nf'
 include { COUNT_MATRIX } from './modules/count_matrix.nf'
 include { DESEQ2 } from './modules/deseq2.nf'
 include { MULTIQC } from './modules/multiqc.nf'
+include { ENRICHMENT } from './modules/enrichment.nf'
 
 
  params {
@@ -52,7 +53,7 @@ workflow {
     samplesheet_ch = channel.fromPath(params.input).first()
     COUNT_MATRIX(STAR_ALIGN.out.gene_counts.collect(), samplesheet_ch)
     DESEQ2(COUNT_MATRIX.out.count_matrix, samplesheet_ch)
-
+    ENRICHMENT(DESEQ2.out.deseq2_output)
 
     publish:
     fastqc_zip = FASTQC.out.zip
@@ -66,8 +67,7 @@ workflow {
     deseq2_results = DESEQ2.out.deseq2_output
     multiqc_report = MULTIQC.out.report
     multiqc_data = MULTIQC.out.data
-
-
+    enrichment_results = ENRICHMENT.out.enrichment_output
 }
 
 output {
@@ -103,6 +103,9 @@ output {
     }
     multiqc_data {
         path 'multiqc'
+    }
+    enrichment_results {
+        path 'enrichment'
     }
 
 }
