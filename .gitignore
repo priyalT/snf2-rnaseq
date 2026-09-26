@@ -237,6 +237,11 @@ scerevisiae_star/
 .RData
 .Rhistory
 
+# Quarto Outputs
+report.html
+report_files/
+*_files/
+
 # Nextflow
 .nextflow/
 .nextflow.log*
