@@ -1,0 +1,13 @@
+run_accession,study_accession,sample_accession,experiment_accession,tax_id,scientific_name,library_name,sample_alias
+ERR458495,PRJEB5348,SAMEA2400699,ERX424842,4932,Saccharomyces cerevisiae,wild type,wt_sample3
+ERR458502,PRJEB5348,SAMEA2400706,ERX424849,4932,Saccharomyces cerevisiae,mutant,mu_sample3
+ERR458509,PRJEB5348,SAMEA2400713,ERX424856,4932,Saccharomyces cerevisiae,mutant,mu_sample10
+ERR458517,PRJEB5348,SAMEA2400721,ERX424864,4932,Saccharomyces cerevisiae,mutant,mu_sample18
+ERR458528,PRJEB5348,SAMEA2400732,ERX424875,4932,Saccharomyces cerevisiae,mutant,mu_sample29
+ERR458535,PRJEB5348,SAMEA2400739,ERX424882,4932,Saccharomyces cerevisiae,mutant,mu_sample36
+ERR458552,PRJEB5348,SAMEA2400756,ERX424899,4932,Saccharomyces cerevisiae,mutant,mu_sample53
+ERR458882,PRJEB5348,SAMEA2401091,ERX425229,4932,Saccharomyces cerevisiae,wild type,wt_sample12
+ERR458887,PRJEB5348,SAMEA2401096,ERX425234,4932,Saccharomyces cerevisiae,wild type,wt_sample17
+ERR458905,PRJEB5348,SAMEA2401114,ERX425252,4932,Saccharomyces cerevisiae,wild type,wt_sample35
+ERR458906,PRJEB5348,SAMEA2401115,ERX425253,4932,Saccharomyces cerevisiae,wild type,wt_sample36
+ERR458921,PRJEB5348,SAMEA2401130,ERX425268,4932,Saccharomyces cerevisiae,wild type,wt_sample51
