@@ -11,7 +11,7 @@ samples <- coldata$sample
 
 for (sample in samples) {
   counts  <- as.data.frame(
-    read_delim(glue("{sample}_ReadsPerGene.out.tab"),
+    read_delim(glue("{sample}_trimmed_ReadsPerGene.out.tab"),
                delim = "\t", col_names = FALSE))
   counts_df <- as.data.frame(counts[, -1])
   rownames(counts_df) <- counts$X1

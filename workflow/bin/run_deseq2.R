@@ -3,7 +3,7 @@
 library(DESeq2)
 library(ggplot2)
 library(apeglm)
-library(tidyverse)
+
 args <- commandArgs(trailingOnly = TRUE)
 
 counts_data <- read.csv("countmatrix.csv", header=TRUE, row.names="X")
