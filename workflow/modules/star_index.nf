@@ -17,7 +17,7 @@ process STAR_INDEX {
     mkdir -p star_index
 
     STAR --runMode genomeGenerate \
-     --runThreadN 4 \
+     --runThreadN ${task.cpus} \
      --genomeDir star_index \
      --genomeFastaFiles ${genomereads} \
      --sjdbGTFfile ${genomeannotation} \

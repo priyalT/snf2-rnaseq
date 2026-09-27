@@ -21,6 +21,6 @@ process STAR_ALIGN {
          --outFileNamePrefix ${trimmed_reads.simpleName}_ \
          --quantMode GeneCounts \
          --outSAMtype None \
-         --runThreadN 4
+         --runThreadN ${task.cpus}
     """
 }
