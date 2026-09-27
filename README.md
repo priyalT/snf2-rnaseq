@@ -39,7 +39,7 @@ To run the pipeline on your dataset, provide a sample sheet and reference genome
 
 ```bash
 nextflow run workflow/main.nf \
-    --input data/samplesheet.csv \
+    --input resources/samplesheet.csv \
     --datadir data/raw \
     --genomereads genome/Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa \
     --genomeannotation genome/Saccharomyces_cerevisiae.R64-1-1.114.gtf \
@@ -57,8 +57,8 @@ nextflow run workflow/main.nf \
 ## Repository Structure
 
 - `workflow/`: Nextflow pipeline scripts, including `main.nf`, `modules/`, and `conf/`.
-- `data/`: Sample sheets and raw data directory.
-- `genome/`: Reference sequences and annotations.
+- `resources/`: Sample sheets.
+- `docs/`: Includes dag image of the workflow and methods report.
 - `report.qmd`: Quarto report template used for compiling downstream analysis and results.
 
 ## Output

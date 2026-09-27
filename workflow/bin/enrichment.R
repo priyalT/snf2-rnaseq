@@ -5,6 +5,15 @@ library(clusterProfiler)
 library(enrichplot)
 library(org.Sc.sgd.db)
 
+get_script_dir <- function() {
+  args <- commandArgs(trailingOnly = FALSE)
+  match <- grep("^--file=", args)
+  if (length(match) > 0) return(dirname(normalizePath(sub("^--file=", "", args[match]))))
+  return(getwd())
+}
+theme_file <- file.path(get_script_dir(), "plot_theme.R")
+if (file.exists(theme_file)) source(theme_file)
+if (exists("custom_theme")) theme_set(custom_theme)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -27,11 +36,18 @@ tryCatch({
   
   dir.create("enrichment_output", showWarnings = FALSE)
   
-  p1 <- dotplot(ego, showCategory = 12) + ggtitle("ORA — GO biological process")
-  ggsave("enrichment_output/ORA_dotplot.png", plot = p1, width = 8, height = 6)
+  ego_simple <- tryCatch(
+    simplify(ego, cutoff = 0.7, by = "p.adjust", select_fun = min),
+    error = function(e) ego
+  )
+
+  p1 <- dotplot(ego_simple, showCategory = 10, label_format = 40) + 
+    ggtitle("ORA: GO Biological Process") +
+    theme(axis.text.y = element_text(size = 10, face = "bold"))
+  ggsave("enrichment_output/ORA_dotplot.png", plot = p1, width = 9, height = 6.5)
   
-  p2 <- cnetplot(ego, showCategory = 5)
-  ggsave("enrichment_output/ORA_cnetplot.png", plot = p2, width = 8, height = 6)
+  p2 <- cnetplot(ego_simple, showCategory = 5)
+  ggsave("enrichment_output/ORA_cnetplot.png", plot = p2, width = 9, height = 7)
   
   write.csv(as.data.frame(ego), "enrichment_output/ORA_results.csv")
   
@@ -58,7 +74,7 @@ tryCatch({
 },
   error = function(e) {
     cat("An error occured: ", conditionMessage(e), "\n")
-    NA
+    quit(save = "no", status = 1)
   }, finally = {
     cat("Enrichment analysis has been executed.\n")
   })

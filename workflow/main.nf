@@ -76,12 +76,14 @@ output {
     }
     fastqc_html {
         path 'fastqc'
+        mode 'copy'
     }
     trimmed_reads {
         path 'trimming'
     }
     trimming_reports {
         path 'trimming'
+        mode 'copy'
     }
     trimming_fastqc {
         path 'trimming'
@@ -94,18 +96,22 @@ output {
     }
     count_matrix {
         path 'counts'
+        mode 'copy'
     }
     deseq2_results {
         path 'deseq2'
+        mode 'copy'
     }
     multiqc_report {
         path 'multiqc'
+        mode 'copy'
     }
     multiqc_data {
         path 'multiqc'
     }
     enrichment_results {
         path 'enrichment'
+        mode 'copy'
     }
 
 }

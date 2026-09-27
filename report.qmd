@@ -44,7 +44,12 @@ The Volcano plot visualizes magnitude of change (log2 Fold Change) versus statis
 
 ![Volcano Plot](workflow/results/deseq2/deseq2_output/Volcano_plot.png)
 
-### 3.4 Key Biological Findings
+### 3.4 Hierarchical Clustering Heatmap
+The heatmap visualizes expression profiles of the top 50 differentially expressed genes across all 12 samples (mean-centered normalized VST counts), with condition annotations indicating WT (green) and snf2Δ (red).
+
+![Top 50 DE Genes Heatmap](workflow/results/deseq2/deseq2_output/Heatmap_top50.png)
+
+### 3.5 Key Biological Findings
 
 **1. SNF2 Knockout**
 The largest fold change in the entire experiment is **SNF2 itself**, confirming the successful knockout. Of the 1,372 significant genes, none experienced a larger downregulation than the target gene.
