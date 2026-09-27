@@ -6,7 +6,7 @@ process STAR_INDEX {
 
     input:
     path genomereads
-    path genomeanotation
+    path genomeannotation
 
     output:
     path "star_index/", emit: index
@@ -20,7 +20,7 @@ process STAR_INDEX {
      --runThreadN 4 \
      --genomeDir star_index \
      --genomeFastaFiles ${genomereads} \
-     --sjdbGTFfile ${genomeanotation} \
+     --sjdbGTFfile ${genomeannotation} \
      --sjdbOverhang 50 \
      --genomeSAindexNbases 11
     """
